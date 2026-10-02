@@ -28,7 +28,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "/api/login.php",
+        "https://nocturnio-roasts-and-tables.onrender.com/api/login",
         {
           method: "POST",
           headers: {
@@ -46,7 +46,7 @@ function Login() {
         data = JSON.parse(text);
       } catch {
         throw new Error(
-          "PHP did not return valid JSON. Check login.php."
+          "Server did not return valid JSON."
         );
       }
 

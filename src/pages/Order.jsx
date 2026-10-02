@@ -11,6 +11,8 @@ function Order() {
   });
 
   const [showPopup, setShowPopup] = useState(false);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -21,10 +23,63 @@ function Order() {
     });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setShowPopup(true);
+    setMessage("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        "https://nocturnio-roasts-and-tables.onrender.com/api/reservations",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customer_name: form.customer_name.trim(),
+            email: form.email.trim(),
+            reservation_date: form.reservation_date,
+            reservation_time: form.reservation_time,
+            guests: Number(form.guests),
+            notes: form.notes.trim(),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Reservation response:", data);
+
+      if (!response.ok || data.success === false) {
+        throw new Error(
+          data.message || "Reservation failed."
+        );
+      }
+
+      setShowPopup(true);
+
+      setForm({
+        customer_name: "",
+        email: "",
+        reservation_date: "",
+        reservation_time: "",
+        guests: 2,
+        notes: "",
+      });
+
+    } catch (error) {
+      console.error("Reservation error:", error);
+
+      setMessage(
+        error.message ||
+          "Unable to connect to the backend."
+      );
+
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -114,11 +169,20 @@ function Order() {
           <button
             type="submit"
             className="gold-button full-width"
+            disabled={loading}
           >
-            Reserve Table
+            {loading
+              ? "Reserving..."
+              : "Reserve Table"}
           </button>
 
         </form>
+
+        {message && (
+          <p className="error-message">
+            {message}
+          </p>
+        )}
 
       </div>
 

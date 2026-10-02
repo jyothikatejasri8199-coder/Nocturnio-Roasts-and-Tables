@@ -58,7 +58,7 @@ function Register() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/register",
+        "https://nocturnio-roasts-and-tables.onrender.com/api/register",
         {
           method: "POST",
           headers: {
