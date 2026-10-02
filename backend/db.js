@@ -1,0 +1,21 @@
+const { Pool } = require("pg");
+const dotenv = require("dotenv");
+const path = require("path");
+
+dotenv.config({
+  path: path.join(__dirname, ".env"),
+});
+
+console.log(
+  "DB URL available in db.js:",
+  process.env.DATABASE_URL ? "YES" : "NO"
+);
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+
+module.exports = pool;

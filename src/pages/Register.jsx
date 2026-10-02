@@ -30,30 +30,24 @@ function Register() {
     setMessage("");
     setMessageType("");
 
-    // Check name
     if (form.name.trim() === "") {
       setMessage("Please enter your full name.");
       setMessageType("error");
       return;
     }
 
-    // Check email
     if (form.email.trim() === "") {
       setMessage("Please enter your email address.");
       setMessageType("error");
       return;
     }
 
-    // Check password
     if (form.password.length < 6) {
-      setMessage(
-        "Password must contain at least 6 characters."
-      );
+      setMessage("Password must contain at least 6 characters.");
       setMessageType("error");
       return;
     }
 
-    // Check confirm password
     if (form.password !== form.confirmPassword) {
       setMessage("Passwords do not match.");
       setMessageType("error");
@@ -63,38 +57,24 @@ function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/register.php", {
-        method: "POST",
+      const response = await fetch(
+        "http://localhost:5000/api/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: form.name.trim(),
+            email: form.email.trim(),
+            password: form.password,
+          }),
+        }
+      );
 
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const data = await response.json();
 
-        body: JSON.stringify({
-          name: form.name.trim(),
-          email: form.email.trim(),
-          password: form.password,
-        }),
-      });
-
-      const responseText = await response.text();
-
-      console.log("Register response:", responseText);
-
-      let data;
-
-      try {
-        data = JSON.parse(responseText);
-      } catch (jsonError) {
-        console.error(
-          "Invalid JSON from PHP:",
-          jsonError
-        );
-
-        throw new Error(
-          "Server returned an invalid response. Check XAMPP, Apache and register.php."
-        );
-      }
+      console.log("Register response:", data);
 
       if (!response.ok || data.success === false) {
         throw new Error(
@@ -102,14 +82,11 @@ function Register() {
         );
       }
 
-      // Registration successful
       setMessage(
         "Registration successful! Redirecting to login..."
       );
-
       setMessageType("success");
 
-      // Clear form
       setForm({
         name: "",
         email: "",
@@ -117,20 +94,16 @@ function Register() {
         confirmPassword: "",
       });
 
-      // Go to login page
       setTimeout(() => {
         navigate("/login");
       }, 1500);
 
     } catch (error) {
-      console.error(
-        "Registration error:",
-        error
-      );
+      console.error("Registration error:", error);
 
       setMessage(
         error.message ||
-          "Failed to connect to the server. Make sure XAMPP and Apache are running."
+          "Unable to connect to the backend."
       );
 
       setMessageType("error");
@@ -142,7 +115,6 @@ function Register() {
 
   return (
     <section className="auth-page">
-
       <div className="auth-card">
 
         <p className="eyebrow">
@@ -161,7 +133,6 @@ function Register() {
 
         <form onSubmit={handleSubmit}>
 
-          {/* Name */}
           <input
             type="text"
             name="name"
@@ -172,7 +143,6 @@ function Register() {
             required
           />
 
-          {/* Email */}
           <input
             type="email"
             name="email"
@@ -183,7 +153,6 @@ function Register() {
             required
           />
 
-          {/* Password */}
           <input
             type="password"
             name="password"
@@ -195,7 +164,6 @@ function Register() {
             required
           />
 
-          {/* Confirm Password */}
           <input
             type="password"
             name="confirmPassword"
@@ -207,7 +175,6 @@ function Register() {
             required
           />
 
-          {/* Submit */}
           <button
             type="submit"
             className="gold-button full-width"
@@ -220,7 +187,6 @@ function Register() {
 
         </form>
 
-        {/* Message */}
         {message && (
           <div
             className={
@@ -233,17 +199,14 @@ function Register() {
           </div>
         )}
 
-        {/* Login link */}
         <p className="auth-link">
           Already have an account?{" "}
-
           <Link to="/login">
             Login
           </Link>
         </p>
 
       </div>
-
     </section>
   );
 }
